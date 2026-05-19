@@ -3222,6 +3222,14 @@ body {
   font-size: 0.78rem;
 }
 
+/* Show full hero image without vertical crop */
+.top-advice-panel .advice-visual {
+  height: auto;
+  aspect-ratio: 1774 / 887;
+  object-fit: contain;
+  background: #fff7fb;
+}
+
 /* Clear lower section grouping */
 .watch-panel,
 .condition-panel,
