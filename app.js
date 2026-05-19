@@ -219,6 +219,15 @@ function bindEvents() {
     render();
   });
 
+  elements.weekStatus.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-week-date-key]");
+    if (!button) return;
+    state.selectedDateKey = button.dataset.weekDateKey;
+    elements.date.value = state.selectedDateKey;
+    state.view = "main";
+    render();
+  });
+
   elements.category.addEventListener("change", () => {
     if (elements.category.value === "medicine" && !elements.reminderTime.value) {
       elements.reminderTime.value = defaultReminderTime(elements.timeSlot.value);
@@ -662,11 +671,17 @@ function weekStatusMarkup(date) {
     const tasks = getTasksForDate(dateKey);
     const completed = tasks.length > 0 && tasks.every((task) => task.done);
     const today = dateKey === toLocalDateKey(new Date());
+    const selected = dateKey === state.selectedDateKey;
     return `
-      <span class="${completed ? "is-complete" : ""} ${today ? "is-today" : ""}">
+      <button
+        type="button"
+        class="${completed ? "is-complete" : ""} ${today ? "is-today" : ""} ${selected ? "is-selected" : ""}"
+        data-week-date-key="${escapeHtml(dateKey)}"
+        aria-current="${selected ? "date" : "false"}"
+      >
         <small>${new Intl.DateTimeFormat("ja-JP", { weekday: "short" }).format(day)}</small>
         <b>${day.getDate()}</b>
-      </span>
+      </button>
     `;
   }).join("");
 }
