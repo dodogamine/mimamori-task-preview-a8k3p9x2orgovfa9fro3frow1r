@@ -6,7 +6,7 @@ const SETTINGS_KEY = "senior-simple-tasks:settings";
 const FAMILY_LOG_KEY = "senior-simple-tasks:family-log";
 const FAMILY_INVITE_KEY = "senior-simple-tasks:family-invite";
 const DUMMY_SEED_KEY = "senior-simple-tasks:dummy-seed";
-const DUMMY_SEED_VERSION = "20260519-more-dummy-tasks-v2";
+const DUMMY_SEED_VERSION = "20260519-ten-tasks-per-day-v4";
 const DEFAULT_PROFILE_PHOTO = "./assets/avatar-default.png";
 
 const timeLabels = {
@@ -1413,12 +1413,15 @@ function loadTasks() {
 function seedDummyTasksOnce(tasks) {
   if (localStorage.getItem(DUMMY_SEED_KEY) === DUMMY_SEED_VERSION) return tasks;
 
-  const existingKeys = new Set(tasks.map((task) => `${task.dateKey}|${getCategory(task.category)}|${task.title}`));
-  const extraSamples = sampleTasks().filter((task) => {
+  const samples = sampleTasks();
+  const sampleDateKeys = new Set(samples.map((task) => task.dateKey));
+  const preservedTasks = tasks.filter((task) => !sampleDateKeys.has(task.dateKey));
+  const existingKeys = new Set(preservedTasks.map((task) => `${task.dateKey}|${getCategory(task.category)}|${task.title}`));
+  const extraSamples = samples.filter((task) => {
     const key = `${task.dateKey}|${getCategory(task.category)}|${task.title}`;
     return !existingKeys.has(key);
   });
-  const seededTasks = [...tasks, ...extraSamples].map(normaliseTask);
+  const seededTasks = [...preservedTasks, ...extraSamples].map(normaliseTask);
   localStorage.setItem(DUMMY_SEED_KEY, DUMMY_SEED_VERSION);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(seededTasks));
   return seededTasks;
@@ -1548,97 +1551,111 @@ function saveSettings() {
 
 function sampleTasks() {
   const today = new Date();
-  const tomorrow = new Date();
-  const dayAfter = new Date();
-  tomorrow.setDate(today.getDate() + 1);
-  dayAfter.setDate(today.getDate() + 2);
-
-  return [
-    {
-      id: "sample-1",
-      title: "朝の薬を飲む",
-      category: "medicine",
-      note: "食後に水で飲む",
-      dateKey: toLocalDateKey(today),
-      timeSlot: "morning",
-      reminderTime: "08:00",
-      done: false,
-      createdAt: new Date().toISOString(),
-      completedAt: null,
-    },
-    {
-      id: "sample-2",
-      title: "昼の薬を飲む",
-      category: "medicine",
-      note: "昼食後に確認",
-      dateKey: toLocalDateKey(today),
-      timeSlot: "noon",
-      reminderTime: "12:30",
-      done: false,
-      createdAt: new Date().toISOString(),
-      completedAt: null,
-    },
-    {
-      id: "sample-3",
-      title: "内科の通院",
-      category: "hospital",
-      note: "診察券とお薬手帳を持つ",
-      dateKey: toLocalDateKey(today),
-      timeSlot: "morning",
-      reminderTime: "10:30",
-      done: false,
-      createdAt: new Date().toISOString(),
-      completedAt: null,
-    },
-    {
-      id: "sample-4",
-      title: "夕方の散歩",
-      category: "exercise",
-      note: "無理のない距離で歩く",
-      dateKey: toLocalDateKey(today),
-      timeSlot: "evening",
-      reminderTime: "16:00",
-      done: true,
-      createdAt: new Date().toISOString(),
-      completedAt: new Date().toISOString(),
-    },
-    {
-      id: "sample-5",
-      title: "水分をとる",
-      category: "life",
-      note: "コップ1杯を目安にする",
-      dateKey: toLocalDateKey(today),
-      timeSlot: "noon",
-      reminderTime: "",
-      done: false,
-      createdAt: new Date().toISOString(),
-      completedAt: null,
-    },
-    {
-      id: "sample-6",
-      title: "通院の持ち物を確認",
-      category: "hospital",
-      note: "保険証、お薬手帳、診察券",
-      dateKey: toLocalDateKey(tomorrow),
-      timeSlot: "evening",
-      reminderTime: "",
-      done: false,
-      createdAt: new Date().toISOString(),
-      completedAt: null,
-    },
-    {
-      id: "sample-7",
-      title: "ごみを出す",
-      category: "life",
-      note: "",
-      dateKey: toLocalDateKey(dayAfter),
-      timeSlot: "morning",
-      reminderTime: "",
-      done: true,
-      createdAt: new Date().toISOString(),
-      completedAt: new Date().toISOString(),
-    },
+  const tasksByDay = [
+    [
+      ["朝の薬を飲む", "medicine", "食後に水で飲む", "morning", "08:00"],
+      ["血圧を記録する", "life", "測った数字をメモする", "morning", "08:15"],
+      ["朝の体操", "exercise", "いすに座ってゆっくり", "morning", "09:00"],
+      ["内科の通院", "hospital", "診察券とお薬手帳を持つ", "morning", "10:30"],
+      ["水分をとる", "life", "コップ1杯を目安にする", "noon", ""],
+      ["昼の薬を飲む", "medicine", "昼食後に確認", "noon", "12:30"],
+      ["買い物メモを確認", "life", "必要なものだけ確認", "noon", ""],
+      ["夕方の散歩", "exercise", "無理のない距離で歩く", "evening", "16:00"],
+      ["夜の薬を飲む", "medicine", "夕食後に確認", "night", "19:30"],
+      ["明日の予定を確認", "life", "服薬と通院の予定を見る", "night", ""],
+    ],
+    [
+      ["朝の薬を飲む", "medicine", "食後に確認", "morning", "08:00"],
+      ["ごみを出す", "life", "玄関前に置く", "morning", ""],
+      ["洗濯物を確認", "life", "天気を見て干す", "morning", ""],
+      ["足の体操", "exercise", "転倒予防の体操", "morning", "10:00"],
+      ["昼の薬を飲む", "medicine", "昼食後に確認", "noon", "12:30"],
+      ["水分をとる", "life", "お茶か水を飲む", "noon", ""],
+      ["薬局へ電話", "hospital", "薬の受け取りを確認", "noon", ""],
+      ["夕方の散歩", "exercise", "近所をゆっくり歩く", "evening", "16:00"],
+      ["夜の薬を飲む", "medicine", "夕食後に確認", "night", "19:30"],
+      ["戸締まり確認", "life", "窓と玄関を見る", "night", ""],
+    ],
+    [
+      ["朝の薬を飲む", "medicine", "食後に確認", "morning", "08:00"],
+      ["体温を測る", "life", "朝の体調確認", "morning", "08:20"],
+      ["歯科の予約確認", "hospital", "予約時間を確認", "morning", ""],
+      ["朝のストレッチ", "exercise", "肩と首をゆっくり", "morning", "09:30"],
+      ["昼の薬を飲む", "medicine", "昼食後に確認", "noon", "12:30"],
+      ["昼食後の片付け", "life", "食器を片付ける", "noon", ""],
+      ["水分をとる", "life", "コップ1杯", "noon", ""],
+      ["夕方の体操", "exercise", "軽く足踏み", "evening", "16:00"],
+      ["夜の薬を飲む", "medicine", "夕食後に確認", "night", "19:30"],
+      ["家族へ連絡", "life", "今日の様子を伝える", "night", ""],
+    ],
+    [
+      ["朝の薬を飲む", "medicine", "食後に確認", "morning", "08:00"],
+      ["通院の持ち物確認", "hospital", "保険証と診察券", "morning", "09:00"],
+      ["朝の体操", "exercise", "ゆっくり深呼吸", "morning", "09:30"],
+      ["水やり", "life", "植木に水をあげる", "morning", ""],
+      ["昼の薬を飲む", "medicine", "昼食後に確認", "noon", "12:30"],
+      ["買い物リスト確認", "life", "必要なものを見る", "noon", ""],
+      ["水分をとる", "life", "午後の水分補給", "noon", ""],
+      ["夕方の散歩", "exercise", "無理せず歩く", "evening", "16:00"],
+      ["夜の薬を飲む", "medicine", "夕食後に確認", "night", "19:30"],
+      ["明日の服を準備", "life", "天気に合わせる", "night", ""],
+    ],
+    [
+      ["朝の薬を飲む", "medicine", "食後に確認", "morning", "08:00"],
+      ["血圧を記録する", "life", "朝の数字を残す", "morning", "08:15"],
+      ["病院へ行く準備", "hospital", "お薬手帳を持つ", "morning", "09:20"],
+      ["朝のストレッチ", "exercise", "腰をゆっくり伸ばす", "morning", ""],
+      ["昼の薬を飲む", "medicine", "昼食後に確認", "noon", "12:30"],
+      ["水分をとる", "life", "コップ1杯", "noon", ""],
+      ["郵便物を確認", "life", "大事な書類を見る", "noon", ""],
+      ["夕方の散歩", "exercise", "近くを一周", "evening", "16:00"],
+      ["夜の薬を飲む", "medicine", "夕食後に確認", "night", "19:30"],
+      ["就寝前の確認", "life", "電気と戸締まり", "night", ""],
+    ],
+    [
+      ["朝の薬を飲む", "medicine", "食後に確認", "morning", "08:00"],
+      ["朝食を食べる", "life", "無理なく食べる", "morning", ""],
+      ["ラジオ体操", "exercise", "できる範囲で", "morning", "09:00"],
+      ["薬の残りを確認", "medicine", "不足がないか見る", "morning", ""],
+      ["昼の薬を飲む", "medicine", "昼食後に確認", "noon", "12:30"],
+      ["水分をとる", "life", "お茶か水を飲む", "noon", ""],
+      ["家族と電話", "life", "短く近況を話す", "noon", ""],
+      ["夕方の散歩", "exercise", "日が暮れる前に", "evening", "16:00"],
+      ["夜の薬を飲む", "medicine", "夕食後に確認", "night", "19:30"],
+      ["明日の薬を準備", "medicine", "朝昼夜を確認", "night", ""],
+    ],
+    [
+      ["朝の薬を飲む", "medicine", "食後に確認", "morning", "08:00"],
+      ["体調メモを書く", "life", "気になることだけ", "morning", ""],
+      ["朝の体操", "exercise", "腕をゆっくり回す", "morning", "09:00"],
+      ["通院予定を確認", "hospital", "今週の予定を見る", "morning", ""],
+      ["昼の薬を飲む", "medicine", "昼食後に確認", "noon", "12:30"],
+      ["水分をとる", "life", "午後も忘れずに", "noon", ""],
+      ["部屋を整える", "life", "歩く場所を片付ける", "noon", ""],
+      ["夕方の散歩", "exercise", "気分転換に歩く", "evening", "16:00"],
+      ["夜の薬を飲む", "medicine", "夕食後に確認", "night", "19:30"],
+      ["一週間を確認", "life", "終わった予定を見る", "night", ""],
+    ],
   ];
+
+  return getWeekDates(today).flatMap((day, dayIndex) => {
+    const dateKey = toLocalDateKey(day);
+    return tasksByDay[dayIndex].map(([title, category, note, timeSlot, reminderTime], taskIndex) => {
+      const done = taskIndex < 2 && dayIndex <= 1;
+      return {
+        id: `sample-${dateKey}-${taskIndex + 1}`,
+        title,
+        category,
+        note,
+        dateKey,
+        timeSlot,
+        reminderTime,
+        done,
+        createdAt: new Date().toISOString(),
+        completedAt: done ? new Date().toISOString() : null,
+      };
+    });
+  });
 }
 
 function inferCategory(title) {
