@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="らくらく予定メモ">
+  <rect width="128" height="128" rx="18" fill="#176b5d"/>
+  <rect x="26" y="24" width="76" height="84" rx="10" fill="#ffffff"/>
+  <path d="M43 51h42" stroke="#245f9d" stroke-width="8" stroke-linecap="round"/>
+  <path d="M43 72h30" stroke="#cf5841" stroke-width="8" stroke-linecap="round"/>
+  <path d="M43 92h42" stroke="#f1bc45" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="86" cy="72" r="9" fill="#176b5d"/>
+</svg>

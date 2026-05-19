@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>見守りタスク</title>
+    <link rel="icon" href="./assets/icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css?v=20260519-header-logo" />
+  </head>
+  <body>
+    <main class="app-shell" id="top" aria-labelledby="app-title">
+      <header class="app-header">
+        <div class="brand-lockup">
+          <img class="brand-icon app-logo" src="./assets/header-logo.svg" alt="" width="52" height="52" />
+          <div>
+            <h1 id="app-title">見守りタスク</h1>
+          </div>
+          <button class="header-task-button" type="button" data-view-target="add">＋ 登録</button>
+          <button class="hamburger-button" id="hamburgerButton" type="button" aria-expanded="false" aria-controls="appMenu">
+            <img id="profileMenuPhoto" alt="" hidden />
+            <span id="profileMenuInitial" aria-hidden="true">人</span>
+            <b>メニュー</b>
+          </button>
+        </div>
+      </header>
+
+      <section class="advice-panel top-advice-panel" aria-labelledby="advice-title">
+        <img class="advice-visual" src="./assets/monitoring-hero-generated.png" alt="" loading="lazy" />
+        <div class="advice-heading">
+          <div>
+            <h2 id="advice-title">今日のアドバイス</h2>
+          </div>
+          <label class="voice-switch" for="voiceGuideToggle">
+            <input id="voiceGuideToggle" type="checkbox" />
+            <span aria-hidden="true"><b id="voiceGuideState">OFF</b></span>
+            <strong>問診</strong>
+          </label>
+        </div>
+        <p id="adviceText">服薬マーカーを見ながら、ゆっくり確認しましょう。</p>
+      </section>
+
+      <div class="content-screen" id="mainScreen">
+        <section class="daily-dashboard" aria-label="やることリスト">
+          <div class="dashboard-main-panel">
+            <section class="week-panel" aria-labelledby="week-title">
+              <p class="eyebrow">週間</p>
+              <h2 id="week-title" class="visually-hidden">今週の達成状況</h2>
+              <div class="week-status" id="weekStatus" aria-label="今週の達成状況"></div>
+            </section>
+
+            <section class="whiteboard-section" aria-label="やることリストの進捗">
+              <div class="whiteboard-summary" aria-label="やることリスト">
+                <div class="whiteboard-summary-heading">
+                  <strong id="whiteboardSummaryDate">今日</strong>
+                </div>
+                <div class="summary-cards" id="summaryCards" aria-label="進捗まとめ"></div>
+                <div class="progress-panel" aria-label="今日の進捗">
+                  <div>
+                    <strong>今日の進捗</strong>
+                    <span id="dashboardProgressText">0%</span>
+                  </div>
+                  <div class="progress-track"><span id="dashboardProgressBar"></span></div>
+                </div>
+              </div>
+            </section>
+            <div class="dashboard-task-list" id="dashboardTaskList" aria-live="polite"></div>
+          </div>
+
+          <div class="dashboard-side-panel">
+            <section class="family-log-panel" aria-labelledby="family-log-title">
+              <div class="family-log-heading">
+                <div>
+                  <p class="eyebrow">家族共有</p>
+                  <h2 id="family-log-title">家族への通知ログ</h2>
+                </div>
+                <span>最新5件</span>
+              </div>
+              <div class="family-log-list" id="familyLogList" aria-live="polite"></div>
+            </section>
+
+            <section class="watch-panel" aria-labelledby="watch-title">
+              <div class="watch-heading">
+                <div>
+                  <h2 id="watch-title">見守り状況</h2>
+                </div>
+                <img class="watch-visual" src="./assets/watch-status.svg" alt="" loading="lazy" />
+                <span id="watchStatusBadge">確認中</span>
+              </div>
+              <p id="watchStatusText">今日の様子を確認できます。</p>
+              <div class="watch-analytics" id="watchAnalytics" aria-label="見守り分析"></div>
+            </section>
+
+            <section class="condition-panel" aria-labelledby="condition-title">
+              <div class="condition-heading">
+                <h2 id="condition-title">今日の様子</h2>
+                <span id="conditionStatus">未記録</span>
+              </div>
+              <div class="condition-buttons" aria-label="今日の様子">
+                <button type="button" data-condition="元気">元気</button>
+                <button type="button" data-condition="いつも通り">いつも通り</button>
+                <button type="button" data-condition="気になる">気になる</button>
+              </div>
+            </section>
+
+            <section class="emergency-panel" aria-label="緊急連絡">
+              <button class="emergency-button" id="emergencyButton" type="button">緊急連絡</button>
+            </section>
+
+          </div>
+        </section>
+
+        <section class="family-invite-card" aria-label="家族LINE通知">
+          <div>
+            <strong>家族LINE通知</strong>
+            <p id="familyInviteStatus">未連携：QRコードで家族を招待できます。</p>
+          </div>
+          <button class="secondary-button" id="inviteFamilyButton" type="button">家族を招待</button>
+        </section>
+      </div>
+
+      <section class="day-screen" id="dayScreen" aria-labelledby="selectedDayTitle" hidden>
+        <button class="back-button" id="backToCalendarButton" type="button">← 戻る</button>
+        <div class="selected-day-panel">
+          <div class="selected-day-heading">
+            <div>
+              <p class="eyebrow">日別タスク</p>
+              <h2 id="selectedDayTitle">今日のタスク</h2>
+            </div>
+            <button class="selected-add-button" id="selectedAddButton" type="button">この日に追加</button>
+          </div>
+          <div id="selectedTaskList" class="selected-task-list" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <div class="workspace add-screen" id="workspace" hidden>
+        <button class="back-button add-back-button" id="backFromAddButton" type="button">← 戻る</button>
+        <section class="entry-panel" aria-labelledby="entry-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">かんたん追加</p>
+              <h2 id="entry-title">やることを入れる</h2>
+            </div>
+            <button class="secondary-button" id="readabilityButton" type="button">大きく表示</button>
+          </div>
+
+          <form id="taskForm" novalidate>
+            <label class="field-label" for="taskTitle">やること</label>
+            <input
+              id="taskTitle"
+              class="text-input"
+              name="title"
+              type="text"
+              autocomplete="off"
+              placeholder="例: 薬を飲む"
+              required
+            />
+            <p class="field-help" id="voiceStatus" aria-live="polite">短い言葉で大丈夫です。</p>
+
+            <label class="field-label" for="taskCategory">分類</label>
+            <select id="taskCategory" class="text-input" name="category">
+              <option value="medicine">服薬</option>
+              <option value="hospital">通院</option>
+              <option value="exercise">運動</option>
+              <option value="life">生活</option>
+            </select>
+
+            <label class="field-label" for="taskDate">日付</label>
+            <input id="taskDate" class="text-input" name="date" type="date" required />
+
+            <label class="field-label" for="timeSlot">時間帯</label>
+            <select id="timeSlot" class="text-input" name="timeSlot">
+              <option value="none">決めない</option>
+              <option value="morning">朝</option>
+              <option value="noon">昼</option>
+              <option value="evening">夕方</option>
+              <option value="night">夜</option>
+            </select>
+
+            <label class="field-label" for="reminderTime">お知らせ時刻</label>
+            <input id="reminderTime" class="text-input" name="reminderTime" type="time" />
+            <p class="field-help">服薬予定の目安時刻として使います。</p>
+
+            <label class="field-label" for="taskNote">メモ</label>
+            <textarea
+              id="taskNote"
+              class="text-area"
+              name="note"
+              rows="3"
+              placeholder="場所や持ち物など"
+            ></textarea>
+
+            <button class="primary-button" type="submit">
+              <span aria-hidden="true">＋</span>
+              この日に入れる
+            </button>
+          </form>
+
+          <div class="quick-add" aria-label="よく使うタスク">
+            <p>よく使うタスク</p>
+            <button type="button" data-template="薬を飲む" data-category="medicine">薬を飲む</button>
+            <button type="button" data-template="通院の準備" data-category="hospital">通院の準備</button>
+            <button type="button" data-template="体操をする" data-category="exercise">体操をする</button>
+            <button type="button" data-template="ごみを出す" data-category="life">ごみを出す</button>
+          </div>
+        </section>
+      </div>
+
+      <section class="login-screen app-page" id="loginScreen" aria-labelledby="login-title" hidden>
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">ログイン</p>
+            <h2 id="login-title">利用者を確認</h2>
+          </div>
+          <button class="secondary-button" type="button" data-view-target="main">戻る</button>
+        </div>
+        <form class="simple-form" id="loginForm">
+          <label class="field-label" for="loginName">お名前</label>
+          <input id="loginName" class="text-input" type="text" autocomplete="name" placeholder="例: 山田 花子" />
+
+          <label class="field-label" for="loginCode">確認コード</label>
+          <input id="loginCode" class="text-input" type="tel" inputmode="numeric" placeholder="例: 1234" />
+          <p class="field-help">モック用です。実際の認証はあとで接続します。</p>
+
+          <button class="primary-button" type="submit">ログインする</button>
+        </form>
+      </section>
+
+      <section class="settings-screen app-page" id="settingsScreen" aria-labelledby="settings-title" hidden>
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">設定</p>
+            <h2 id="settings-title">アプリ設定</h2>
+          </div>
+          <button class="secondary-button" type="button" data-view-target="main">戻る</button>
+        </div>
+        <form class="simple-form" id="settingsForm">
+          <div class="photo-setting">
+            <div class="photo-preview" id="settingsPhotoPreview" aria-hidden="true">人</div>
+            <div>
+              <label class="field-label" for="settingsPhoto">登録写真</label>
+              <input id="settingsPhoto" class="text-input" type="file" accept="image/*" />
+              <p class="field-help">スマホではこの写真アイコンからメニューを開きます。</p>
+            </div>
+          </div>
+
+          <label class="field-label" for="settingsUserName">利用者名</label>
+          <input id="settingsUserName" class="text-input" type="text" placeholder="例: 山田 花子" />
+
+          <label class="field-label" for="settingsFamilyName">家族の表示名</label>
+          <input id="settingsFamilyName" class="text-input" type="text" placeholder="例: 長男 太郎" />
+
+          <label class="field-label" for="settingsDefaultTime">服薬の目安時刻</label>
+          <input id="settingsDefaultTime" class="text-input" type="time" />
+
+          <label class="setting-row" for="settingsLargeText">
+            <span>
+              <strong>文字を大きく表示</strong>
+              <small>画面全体の文字サイズを少し大きくします。</small>
+            </span>
+            <input id="settingsLargeText" type="checkbox" />
+          </label>
+
+          <button class="primary-button" type="submit">設定を保存</button>
+        </form>
+      </section>
+
+      <footer class="app-footer" aria-label="フッター">
+        <div>
+          <strong>見守りタスク</strong>
+          <span>シニア向けタスク管理</span>
+        </div>
+        <nav aria-label="フッター画面切り替え">
+          <button type="button" data-view-target="main">ホーム</button>
+          <button type="button" data-view-target="add">登録</button>
+          <button type="button" data-view-target="settings">設定</button>
+        </nav>
+      </footer>
+    </main>
+
+    <section class="app-menu-backdrop" id="appMenu" aria-labelledby="appMenuTitle" hidden>
+      <div class="app-menu-panel">
+        <div class="app-menu-heading">
+          <div>
+            <p class="eyebrow">メニュー</p>
+            <h2 id="appMenuTitle">画面を選ぶ</h2>
+          </div>
+          <button class="menu-close-button" id="menuCloseButton" type="button">閉じる</button>
+        </div>
+        <div class="app-menu-list">
+          <button type="button" data-view-target="main">ホーム</button>
+          <button type="button" data-view-target="add">タスク登録</button>
+          <button type="button" data-view-target="settings">設定</button>
+          <button type="button" data-view-target="login">ログイン</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="marker-confirm" id="markerConfirm" role="dialog" aria-modal="true" aria-labelledby="markerConfirmTitle" hidden>
+      <div class="marker-confirm-panel">
+        <p class="eyebrow">服薬確認</p>
+        <h2 id="markerConfirmTitle">完了へ移動しますか？</h2>
+        <p id="markerConfirmDetail">この服薬マーカーを完了へ移します。</p>
+        <div class="marker-confirm-actions">
+          <button class="primary-button" id="markerConfirmButton" type="button">完了へ移動</button>
+          <button class="secondary-button" id="markerCancelButton" type="button">取り消す</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="marker-confirm" id="markerAddConfirm" role="dialog" aria-modal="true" aria-labelledby="markerAddTitle" hidden>
+      <div class="marker-confirm-panel">
+        <p class="eyebrow">マーカー追加</p>
+        <h2 id="markerAddTitle">いつ飲みますか？</h2>
+        <p>朝・昼・夜から選ぶと、服薬マーカーを追加します。</p>
+        <div class="time-choice-grid" aria-label="追加する時間帯">
+          <button class="time-choice-button" type="button" data-add-slot="morning">朝</button>
+          <button class="time-choice-button" type="button" data-add-slot="noon">昼</button>
+          <button class="time-choice-button" type="button" data-add-slot="night">夜</button>
+        </div>
+        <div class="marker-confirm-actions">
+          <button class="secondary-button" id="markerAddCancelButton" type="button">取り消す</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="marker-confirm" id="familyInviteModal" role="dialog" aria-modal="true" aria-labelledby="familyInviteTitle" hidden>
+      <div class="marker-confirm-panel family-invite-panel">
+        <p class="eyebrow">家族招待</p>
+        <h2 id="familyInviteTitle">LINE通知を家族につなぐ</h2>
+        <p>家族がQRコードを読み取り、LINEで友だち追加すると通知を受け取れます。</p>
+        <div class="invite-qr" id="inviteQr" aria-label="家族招待QRコード"></div>
+        <label class="invite-link-label" for="familyInviteLink">招待リンク</label>
+        <input class="text-input invite-link-input" id="familyInviteLink" type="text" readonly />
+        <ol class="invite-steps">
+          <li>家族がQRコードを読み取る</li>
+          <li>招待ページでLINE公式アカウントを友だち追加</li>
+          <li>この利用者への通知先として自動で紐づけ</li>
+        </ol>
+        <div class="marker-confirm-actions">
+          <button class="primary-button" id="copyInviteLinkButton" type="button">リンクをコピー</button>
+          <button class="secondary-button" id="familyInviteCloseButton" type="button">閉じる</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="marker-confirm" id="voiceQuestionModal" role="dialog" aria-modal="true" aria-labelledby="voiceQuestionTitle" hidden>
+      <div class="marker-confirm-panel voice-question-panel">
+        <p class="eyebrow">問診</p>
+        <h2 id="voiceQuestionTitle">今日の様子を教えてください</h2>
+        <p>選んだ内容は見守り状況と家族への通知ログに反映されます。</p>
+        <div class="voice-question-grid" aria-label="今日の様子を選ぶ">
+          <button class="condition-good" type="button" data-voice-condition="元気">元気</button>
+          <button class="condition-normal" type="button" data-voice-condition="いつも通り">いつも通り</button>
+          <button class="condition-bad" type="button" data-voice-condition="気になる">気になる</button>
+        </div>
+        <div class="marker-confirm-actions">
+          <button class="secondary-button" id="voiceQuestionCloseButton" type="button">あとで</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <script src="./app.js?v=20260519-no-sticky-footer"></script>
+  </body>
+</html>
